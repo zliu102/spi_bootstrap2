@@ -156,7 +156,7 @@ static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
 
 
 
-PG_FUNCTION_INFO_V1(spi_bootstrap2);
+PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
 Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     int ret;
