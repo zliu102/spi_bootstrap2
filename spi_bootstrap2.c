@@ -60,7 +60,7 @@
 #include "access/printtup.h"
 //#include "/home/oracle/datasets/postgres11ps/postgres-pbds/contrib/intarray/_int.h"
 #define MAX_QUANTITIES 20 
-#define MAX_GROUPS 1000
+#define MAX_GROUPS 30000
 
 PG_MODULE_MAGIC;
 
