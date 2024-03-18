@@ -67,7 +67,7 @@ PG_MODULE_MAGIC;
 typedef struct {
     int l_suppkey;
     int l_returnflag_int;
-    float4 quantities[MAX_QUANTITIES]
+    float4 quantities[MAX_QUANTITIES];
     int count;
 } MyGroup;
 
