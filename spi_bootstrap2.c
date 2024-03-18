@@ -59,26 +59,26 @@
 #include "miscadmin.h"
 #include "access/printtup.h"
 //#include "/home/oracle/datasets/postgres11ps/postgres-pbds/contrib/intarray/_int.h"
+#define MAX_QUANTITIES 20 
+#define MAX_GROUPS 30000
 
 PG_MODULE_MAGIC;
 
 typedef struct {
     int l_suppkey;
     int l_returnflag_int;
-    float4 *quantities;
+    float4 quantities[MAX_QUANTITIES]
     int count;
-    int capacity;
 } MyGroup;
 
 typedef struct {
-    MyGroup *groups;
+    MyGroup groups[MAX_GROUPS];
     int numGroups;
-    int capacity;
 } GroupsContext;
 
 // Utility function declarations
 static void prepTuplestoreResult(FunctionCallInfo fcinfo);
-static MyGroup* findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int);
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int);
 static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 
@@ -106,38 +106,34 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
     rsinfo->setDesc = NULL;
 }
 
-static MyGroup* findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int) {
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int) {
  
     int i;
     for (i = 0; i < context->numGroups; ++i) {
         if (context->groups[i].l_suppkey == l_suppkey && context->groups[i].l_returnflag_int == l_returnflag_int) {
-            return &context->groups[i];
+            return i; // 返回找到的元素的索引
         }
     }
 
 
-    if (context->numGroups >= context->capacity) {
-        
-        context->capacity *= 2;
-        context->groups = (MyGroup *) repalloc(context->groups, sizeof(MyGroup) * context->capacity);
+    if (context->numGroups >= MAX_GROUPS) {
+        ereport(ERROR, (errmsg("error")));
+        return -1; // 超出最大组数，处理错误
     }
 
-    MyGroup *newGroup = &context->groups[context->numGroups++];
-    newGroup->l_suppkey = l_suppkey;
-    newGroup->l_returnflag_int = l_returnflag_int;
-    newGroup->quantities = (float4 *) palloc(sizeof(float4) * 100); // problem
-    newGroup->count = 0;
-    newGroup->capacity = 100;
 
-    return newGroup;
+    context->groups[context->numGroups].l_suppkey = l_suppkey;
+    context->groups[context->numGroups].l_returnflag_int = l_returnflag_int;
+    context->groups[context->numGroups].count = 0;
+
+    return context->numGroups++;
 }
 
 
 static void addQuantityToGroup(MyGroup *group, float4 quantity) {
-    if (group->count >= group->capacity) {
-        
-        group->capacity *= 2;
-        group->quantities = (float4 *) repalloc(group->quantities, sizeof(float4) * group->capacity);
+    if (group->count >= MAX_QUANTITIES) {
+        ereport(ERROR, (errmsg("error")));
+        return; // 超出最大数量，处理错误
     }
     group->quantities[group->count++] = quantity;
 }
@@ -204,9 +200,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
 
     // Initialize GroupsContext
     GroupsContext groupsContext;
-    groupsContext.groups = (MyGroup *)palloc(sizeof(MyGroup) * 30000); // problem 1Initial capacity
     groupsContext.numGroups = 0;
-    groupsContext.capacity = 30000;
 
     // Process SPI results
    
@@ -238,8 +232,10 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI l_returnflag_int -- %d", l_returnflag_int);
         //elog(INFO, "SPI quantity -- %d", quantity);
       
-        MyGroup *group = findOrCreateGroup(&groupsContext, l_suppkey, l_returnflag_int);
-        addQuantityToGroup(group, quantity);
+        int groupIndex = findOrCreateGroup(&groupsContext, l_suppkey, l_returnflag_int);
+        if (groupIndex != -1) { 
+            addQuantityToGroup(&groupsContext.groups[groupIndex], quantity);
+        }
 
         //elog(INFO, "group l_suppkey is %d", group->l_suppkey);
         //elog(INFO, "group l_returnflag_int is %d", group->l_returnflag_int); 
