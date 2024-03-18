@@ -132,7 +132,7 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_return
     last_groupIndex = newIndex;
 
     context->numGroups++; 
-    return newIndex；
+    return newIndex;
 }
 
 
