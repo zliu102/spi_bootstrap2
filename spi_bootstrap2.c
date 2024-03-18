@@ -107,12 +107,11 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
 }
 
 static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int) {
- 
-    int i;
-    for (i = 0; i < context->numGroups; ++i) {
-        if (context->groups[i].l_suppkey == l_suppkey && context->groups[i].l_returnflag_int == l_returnflag_int) {
-            return i; // 返回找到的元素的索引
-        }
+    static int last_l_suppkey = -1; // 初始化为一个不可能的值
+    static int last_l_returnflag_int = -1; // 初始化为一个不可能的值
+    static int last_groupIndex = -1; // 上一次的组索引
+    if (l_suppkey == last_l_suppkey && l_returnflag_int == last_l_returnflag_int) {
+        return last_groupIndex;
     }
 
 
@@ -121,12 +120,19 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_return
         return -1; // 超出最大组数，处理错误
     }
 
-
+  
+    int newIndex = context->numGroups;
     context->groups[context->numGroups].l_suppkey = l_suppkey;
     context->groups[context->numGroups].l_returnflag_int = l_returnflag_int;
     context->groups[context->numGroups].count = 0;
 
-    return context->numGroups++;
+
+    last_l_suppkey = l_suppkey;
+    last_l_returnflag_int = l_returnflag_int;
+    last_groupIndex = newIndex;
+
+    context->numGroups++; 
+    return newIndex；
 }
 
 
