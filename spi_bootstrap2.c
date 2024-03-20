@@ -165,7 +165,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     int i;
     Tuplestorestate *tupstore;
     TupleDesc tupdesc;
-    //MemoryContext oldcontext;
+    MemoryContext oldcontext;
 
     // Connect to SPI
     if (SPI_connect() != SPI_OK_CONNECT) {
@@ -181,6 +181,14 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     prepTuplestoreResult(fcinfo);
     ReturnSetInfo *rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
     //oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
+    oldcontext = MemoryContextSwitchTo(rsinfo->econtext->ecxt_per_query_memory);
+
+    tupstore = tuplestore_begin_heap(true, false, work_mem);
+    rsinfo->returnMode = SFRM_Materialize;
+    rsinfo->setResult = tupstore;
+    rsinfo->setDesc = tupdesc;
+
+    MemoryContextSwitchTo(oldcontext);
 
     snprintf(sql, sizeof(sql), "select * from reservoir_sampler_tpch(%s,'%s','%s','%s');",sampleSize,tablename,otherAttribue,groupby);
     //elog(INFO, "SPI query -- %s", sql);
@@ -198,7 +206,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     //TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", INT4OID, -1, 0);
     tupdesc = BlessTupleDesc(tupdesc);
     
-    tupstore = tuplestore_begin_heap(true, false, work_mem);
+    //tupstore = tuplestore_begin_heap(true, false, work_mem);
     //MemoryContextSwitchTo(oldcontext); //problem 
 
     
@@ -275,18 +283,17 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
-    values = (Datum *) palloc(3 * sizeof(Datum));
-    nulls = (bool *) palloc(3 * sizeof(bool));
-
-    // 初始化nulls数组
+    Datum values[3]; 
+    bool nulls[3];
+    //bool nulls[3] = {false, false, false}; 
     nulls[0] = false;
     nulls[1] = false;
     nulls[2] = false;
-
-    // 设置values数组
-    values[0] = Int32GetDatum(1);
-    values[1] = Int32GetDatum(2);
-    values[2] = Float4GetDatum(3.14);
+        
+    values[0] = Int32GetDatum(1); 
+    values[1] = Int32GetDatum(2); 
+    //values[2] = Int32GetDatum(3);
+    values[2] = Float4GetDatum(3.14); 
     elog(INFO, "here");
     elog(INFO, "l_suppkey is %d",values[0]);
     elog(INFO, "l_returnflag_int is %d",values[1]);
@@ -298,9 +305,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     tuplestore_donestoring(tupstore);
     // Cleanup
 
-    rsinfo->setResult = tupstore;
-    rsinfo->setDesc = tupdesc;
-    rsinfo->returnMode = SFRM_Materialize;
+   // rsinfo->setResult = tupstore;
+   // rsinfo->setDesc = tupdesc;
+   // rsinfo->returnMode = SFRM_Materialize;
     
     SPI_finish();
 
