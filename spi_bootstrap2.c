@@ -271,7 +271,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     srand(time(NULL)); // Initialize random seed
     int j;
     for (j = 0; j < groupsContext.numGroups; j++) {
-        elog(INFO, "SPI j is -- %d", j);
+        //elog(INFO, "SPI j is -- %d", j);
         
         MyGroup *group = &groupsContext.groups[j];
         
@@ -286,9 +286,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //values[0] = group->l_suppkey;
         //values[1] = group->l_returnflag_int;
         //values[2] = avg_quantity;
-        elog(INFO, "l_suppkey is %d",values[0]);
-        elog(INFO, "l_returnflag_int is %d",values[1]);
-        elog(INFO, "avg_l_quantity is %f",avg_l_quantity);
+        //elog(INFO, "l_suppkey is %d",values[0]);
+        //elog(INFO, "l_returnflag_int is %d",values[1]);
+        //elog(INFO, "avg_l_quantity is %f",avg_l_quantity);
         
         
 
