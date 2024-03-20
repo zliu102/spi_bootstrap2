@@ -292,7 +292,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         
         
 
-        //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
+        tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
     
