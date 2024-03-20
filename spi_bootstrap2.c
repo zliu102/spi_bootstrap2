@@ -166,6 +166,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     Tuplestorestate *tupstore;
     TupleDesc tupdesc;
     MemoryContext oldcontext;
+    MemoryContext per_query_ctx;
 
     // Connect to SPI
     if (SPI_connect() != SPI_OK_CONNECT) {
@@ -179,7 +180,10 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     char* otherAttribue = text_to_cstring(PG_GETARG_TEXT_PP(2));
     char* groupby = text_to_cstring(PG_GETARG_TEXT_PP(3));
     //prepTuplestoreResult(fcinfo);
+    /*
     ReturnSetInfo *rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
+
+    per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
     oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
     //oldcontext = MemoryContextSwitchTo(rsinfo->econtext->ecxt_per_query_memory);
 
@@ -189,6 +193,13 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     rsinfo->setDesc = tupdesc;
 
     MemoryContextSwitchTo(oldcontext);
+*/
+
+
+    per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
+    oldcontext = MemoryContextSwitchTo(per_query_ctx);
+    tupstore = tuplestore_begin_heap(true, false, work_mem);
+    MemoryContextSwitchTo(oldcontext); //test
 
     snprintf(sql, sizeof(sql), "select * from reservoir_sampler_tpch(%s,'%s','%s','%s');",sampleSize,tablename,otherAttribue,groupby);
     //elog(INFO, "SPI query -- %s", sql);
@@ -297,7 +308,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     values[0] = Int32GetDatum(1); 
     values[1] = Int32GetDatum(2); 
     //values[2] = Int32GetDatum(3);
-    values[2] = Float4GetDatum(3.14); 
+    values[2] = Float4GetDatum(3.14f); 
     elog(INFO, "here");
     elog(INFO, "l_suppkey is %d",values[0]);
     elog(INFO, "l_returnflag_int is %d",values[1]);
@@ -309,9 +320,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     tuplestore_donestoring(tupstore);
     // Cleanup
 
-   // rsinfo->setResult = tupstore;
-   // rsinfo->setDesc = tupdesc;
-   // rsinfo->returnMode = SFRM_Materialize;
+    rsinfo->setResult = tupstore;
+    rsinfo->setDesc = tupdesc;
+    rsinfo->returnMode = SFRM_Materialize;
     
     SPI_finish();
 
