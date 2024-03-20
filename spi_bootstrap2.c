@@ -211,7 +211,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
 
     
     
-
+    /*
     // Initialize GroupsContext
     GroupsContext groupsContext;
     groupsContext.numGroups = 0;
@@ -283,6 +283,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
+    */
+
+
     Datum values[3]; 
     bool nulls[3];
     //bool nulls[3] = {false, false, false}; 
@@ -298,7 +301,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     elog(INFO, "l_suppkey is %d",values[0]);
     elog(INFO, "l_returnflag_int is %d",values[1]);
     elog(INFO, "avg_l_quantity is %f",3.14);
-    tuplestore_putvalues(tupstore, tupdesc, values, nulls);
+    //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
     HeapTuple tuple = heap_form_tuple(tupdesc, values, nulls);
     tuplestore_puttuple(tupstore, tuple);
 
