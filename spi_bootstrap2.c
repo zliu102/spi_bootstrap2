@@ -204,6 +204,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_returnflag_int", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", INT4OID, -1, 0);
+    tupdesc = CreateTupleDescCopy(SPI_tuptable->tupdesc);
     tupdesc = BlessTupleDesc(tupdesc);
     
     //tupstore = tuplestore_begin_heap(true, false, work_mem);
