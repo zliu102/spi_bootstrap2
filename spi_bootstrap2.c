@@ -180,8 +180,8 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     char* groupby = text_to_cstring(PG_GETARG_TEXT_PP(3));
     prepTuplestoreResult(fcinfo);
     ReturnSetInfo *rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
-    //oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
-    oldcontext = MemoryContextSwitchTo(rsinfo->econtext->ecxt_per_query_memory);
+    oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
+    //oldcontext = MemoryContextSwitchTo(rsinfo->econtext->ecxt_per_query_memory);
 
     tupstore = tuplestore_begin_heap(true, false, work_mem);
     rsinfo->returnMode = SFRM_Materialize;
