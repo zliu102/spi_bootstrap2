@@ -252,7 +252,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     int j;
     for (j = 0; j < groupsContext.numGroups; j++) {
         elog(INFO, "SPI j is -- %d", j);
-        /*
+        
         MyGroup *group = &groupsContext.groups[j];
         
         float4 avg_l_quantity = calculateRandomSampleAverage(group->quantities, group->count);
@@ -272,8 +272,8 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         
         
 
-        tuplestore_putvalues(tupstore, tupdesc, values, nulls);
-        */
+        //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
+        
     }
     Datum values[3]; 
     bool nulls[3] = {false, false, false}; 
