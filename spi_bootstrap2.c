@@ -167,7 +167,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     TupleDesc tupdesc;
     MemoryContext oldcontext;
     MemoryContext per_query_ctx;
-
+    ReturnSetInfo *rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
     // Connect to SPI
     if (SPI_connect() != SPI_OK_CONNECT) {
         ereport(ERROR, (errmsg("SPI_connect failed")));
@@ -181,7 +181,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     char* groupby = text_to_cstring(PG_GETARG_TEXT_PP(3));
     //prepTuplestoreResult(fcinfo);
     /*
-    ReturnSetInfo *rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
+    
 
     per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
     oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
