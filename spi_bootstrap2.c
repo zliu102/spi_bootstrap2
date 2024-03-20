@@ -275,14 +275,18 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
-    Datum values[3]; 
-    bool nulls[3] = {false, false, false}; 
+    values = (Datum *) palloc(3 * sizeof(Datum));
+    nulls = (bool *) palloc(3 * sizeof(bool));
 
-        
-    values[0] = Int32GetDatum(1); 
-    values[1] = Int32GetDatum(2); 
-    //values[2] = Int32GetDatum(3);
-    values[2] = Float4GetDatum(3.14); 
+    // 初始化nulls数组
+    nulls[0] = false;
+    nulls[1] = false;
+    nulls[2] = false;
+
+    // 设置values数组
+    values[0] = Int32GetDatum(1);
+    values[1] = Int32GetDatum(2);
+    values[2] = Float4GetDatum(3.14);
     elog(INFO, "here");
     elog(INFO, "l_suppkey is %d",values[0]);
     elog(INFO, "l_returnflag_int is %d",values[1]);
