@@ -297,7 +297,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     }
     
 
-
+    /*
     Datum values[3]; 
     bool nulls[3];
     //bool nulls[3] = {false, false, false}; 
@@ -316,7 +316,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     tuplestore_putvalues(tupstore, tupdesc, values, nulls);
     //HeapTuple tuple = heap_form_tuple(tupdesc, values, nulls);
     //tuplestore_puttuple(tupstore, tuple);
-
+    */
     tuplestore_donestoring(tupstore);
     // Cleanup
 
