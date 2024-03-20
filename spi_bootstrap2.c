@@ -156,6 +156,16 @@ static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
     return sum / sampleSize;
 }
 
+static float4 calculateStandardDeviation(float4 *quantities, int count, float4 mean) {
+    float4 sum_diff_sq = 0;
+    int i = 0
+    for (i = 0; i < count; i++) {
+        float4 diff = quantities[i] - mean;
+        sum_diff_sq += diff * diff;
+    }
+    float4 variance = sum_diff_sq / count;
+    return sqrt(variance); // 使用sqrt函数计算标准差
+}
 
 
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
@@ -210,10 +220,11 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     }
 
     // Prepare for tuplestore use
-    tupdesc = CreateTemplateTupleDesc(3, false);
+    tupdesc = CreateTemplateTupleDesc(4, false);
     TupleDescInitEntry(tupdesc, (AttrNumber) 1, "l_suppkey", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_returnflag_int", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", INT4OID, -1, 0);
     //tupdesc = CreateTupleDescCopy(SPI_tuptable->tupdesc);
     //tupdesc = BlessTupleDesc(tupdesc);
@@ -277,12 +288,15 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         
         float4 avg_l_quantity = calculateRandomSampleAverage(group->quantities, group->count);
 
-        Datum values[3];
-        bool nulls[3] = {false, false, false};
+        float4 stddev = calculateStandardDeviation(group->quantities, group->count, avg_l_quantity);
+
+        Datum values[4];
+        bool nulls[4] = {false, false, false, false};
 
         values[0] = Int32GetDatum(group->l_suppkey);
         values[1] = Int32GetDatum(group->l_returnflag_int);
         values[2] = Float4GetDatum(avg_l_quantity);
+        values[3] = Float4GetDatum(stddev);
         //values[0] = group->l_suppkey;
         //values[1] = group->l_returnflag_int;
         //values[2] = avg_quantity;
