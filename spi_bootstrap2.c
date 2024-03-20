@@ -308,7 +308,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     values[0] = Int32GetDatum(1); 
     values[1] = Int32GetDatum(2); 
     //values[2] = Int32GetDatum(3);
-    values[2] = Float4GetDatum(3.14f); 
+    values[2] = Float4GetDatum(3.14); 
     elog(INFO, "here");
     elog(INFO, "l_suppkey is %d",values[0]);
     elog(INFO, "l_returnflag_int is %d",values[1]);
