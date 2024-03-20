@@ -158,7 +158,7 @@ static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
 
 static float4 calculateStandardDeviation(float4 *quantities, int count, float4 mean) {
     float4 sum_diff_sq = 0;
-    int i = 0
+    int i = 0;
     for (i = 0; i < count; i++) {
         float4 diff = quantities[i] - mean;
         sum_diff_sq += diff * diff;
