@@ -223,7 +223,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
 
     
     
-    /*
+    
     // Initialize GroupsContext
     GroupsContext groupsContext;
     groupsContext.numGroups = 0;
@@ -295,7 +295,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
-    */
+    
 
 
     Datum values[3]; 
