@@ -66,7 +66,7 @@ PG_MODULE_MAGIC;
 
 typedef struct {
     int l_suppkey;
-    int l_tax;
+    double l_tax;
     float4 quantities[MAX_QUANTITIES];
     int count;
 } MyGroup;
@@ -78,7 +78,7 @@ typedef struct {
 
 // Utility function declarations
 static void prepTuplestoreResult(FunctionCallInfo fcinfo);
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_tax);
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
 static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 
@@ -106,9 +106,9 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
     rsinfo->setDesc = NULL;
 }
 
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_tax) {
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax) {
     static int last_l_suppkey = -1; 
-    static int last_l_tax = -1; 
+    static double last_l_tax = -1.0; 
     static int last_groupIndex = -1; 
     if (l_suppkey == last_l_suppkey && l_tax == last_l_tax) {
         return last_groupIndex;
@@ -259,7 +259,8 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI l_returnflag_int -- %s", value2);
         //elog(INFO, "SPI quantity -- %s", value3);
         int l_suppkey = atoi(value1);
-        int l_tax = atoi(value2);
+        //int l_returnflag_int = atoi(value2);
+        double l_tax = strtod(value2, NULL); 
         int quantity = atoi(value3);
 
         //int l_suppkey = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 1, NULL));
@@ -294,7 +295,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         bool nulls[4] = {false, false, false, false};
 
         values[0] = Int32GetDatum(group->l_suppkey);
-        values[1] = DirectFunctionCall1(numeric_float8, PointerGetDatum(group->l_tax));
+        values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
         values[2] = Float4GetDatum(avg_l_quantity);
         values[3] = Float4GetDatum(stddev);
         //values[0] = group->l_suppkey;
