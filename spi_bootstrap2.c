@@ -149,8 +149,8 @@ static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_ta
     static int last_groupIndex = -1;
     
     // 检查上一个值是否相同（这里使用 strcmp 比较字符串）
-    if ((last_l_suppkey != NULL && strcmp(l_suppkey_str, last_l_suppkey) == 0) &&
-        (last_l_tax != NULL && strcmp(l_tax_str, last_l_tax) == 0)) {
+    if ((last_l_suppkey != NULL && strcmp(l_suppkey, last_l_suppkey) == 0) &&
+        (last_l_tax != NULL && strcmp(l_tax, last_l_tax) == 0)) {
         return last_groupIndex;
     }
 
@@ -161,8 +161,8 @@ static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_ta
 
     int newIndex = context->numGroups;
     // 使用 strdup 或等效方法复制字符串
-    context->groups[newIndex].l_suppkey = strdup(l_suppkey_str);
-    context->groups[newIndex].l_tax = strdup(l_tax_str);
+    context->groups[newIndex].l_suppkey = strdup(l_suppkey);
+    context->groups[newIndex].l_tax = strdup(l_tax);
     context->groups[newIndex].count = 0;
 
     // 更新上一个值的指针
