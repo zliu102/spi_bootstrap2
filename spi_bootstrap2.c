@@ -107,9 +107,9 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
 }
 
 static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int) {
-    static int last_l_suppkey = -1; // 初始化为一个不可能的值
-    static int last_l_returnflag_int = -1; // 初始化为一个不可能的值
-    static int last_groupIndex = -1; // 上一次的组索引
+    static int last_l_suppkey = -1; 
+    static int last_l_returnflag_int = -1; 
+    static int last_groupIndex = -1; 
     if (l_suppkey == last_l_suppkey && l_returnflag_int == last_l_returnflag_int) {
         return last_groupIndex;
     }
@@ -117,7 +117,7 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_return
 
     if (context->numGroups >= MAX_GROUPS) {
         ereport(ERROR, (errmsg("error")));
-        return -1; // 超出最大组数，处理错误
+        return -1; 
     }
 
   
@@ -139,7 +139,7 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_return
 static void addQuantityToGroup(MyGroup *group, float4 quantity) {
     if (group->count >= MAX_QUANTITIES) {
         ereport(ERROR, (errmsg("error")));
-        return; // 超出最大数量，处理错误
+        return;
     }
     group->quantities[group->count++] = quantity;
 }
@@ -164,7 +164,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
         sum_diff_sq += diff * diff;
     }
     float4 variance = sum_diff_sq / count;
-    return sqrt(variance); // 使用sqrt函数计算标准差
+    return sqrt(variance); 
 }
 
 
