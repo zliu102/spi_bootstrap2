@@ -63,10 +63,17 @@
 #define MAX_GROUPS 90000
 
 PG_MODULE_MAGIC;
-
+/*
 typedef struct {
     int l_suppkey;
     double l_tax;
+    float4 quantities[MAX_QUANTITIES];
+    int count;
+} MyGroup;
+*/
+typedef struct {
+    char* l_suppkey; 
+    char* l_tax; 
     float4 quantities[MAX_QUANTITIES];
     int count;
 } MyGroup;
@@ -78,7 +85,8 @@ typedef struct {
 
 // Utility function declarations
 static void prepTuplestoreResult(FunctionCallInfo fcinfo);
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
+//static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
+static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax);
 static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 
@@ -105,7 +113,7 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
     rsinfo->setResult = NULL;
     rsinfo->setDesc = NULL;
 }
-
+/*
 static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax) {
     static int last_l_suppkey = -1; 
     static double last_l_tax = -1.0; 
@@ -132,6 +140,37 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax
     last_groupIndex = newIndex;
 
     context->numGroups++; 
+    return newIndex;
+}*/
+
+static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax) {
+    static char* last_l_suppkey = NULL; 
+    static char* last_l_tax = NULL;
+    static int last_groupIndex = -1;
+    
+    // 检查上一个值是否相同（这里使用 strcmp 比较字符串）
+    if ((last_l_suppkey != NULL && strcmp(l_suppkey_str, last_l_suppkey) == 0) &&
+        (last_l_tax != NULL && strcmp(l_tax_str, last_l_tax) == 0)) {
+        return last_groupIndex;
+    }
+
+    if (context->numGroups >= MAX_GROUPS) {
+        ereport(ERROR, (errmsg("Maximum number of groups exceeded")));
+        return -1;
+    }
+
+    int newIndex = context->numGroups;
+    // 使用 strdup 或等效方法复制字符串
+    context->groups[newIndex].l_suppkey = strdup(l_suppkey_str);
+    context->groups[newIndex].l_tax = strdup(l_tax_str);
+    context->groups[newIndex].count = 0;
+
+    // 更新上一个值的指针
+    last_l_suppkey = context->groups[newIndex].l_suppkey;
+    last_l_tax = context->groups[newIndex].l_tax;
+    last_groupIndex = newIndex;
+
+    context->numGroups++;
     return newIndex;
 }
 
@@ -252,19 +291,14 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         char* value1 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum1);
         char* value2 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum2);
         char* value3 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum3);
-        //elog(INFO, "SPI l_suppkey -- %d", attnum1);
-        //elog(INFO, "SPI l_returnflag_int -- %d", attnum2);
-        //elog(INFO, "SPI quantity -- %d", attnum3);
-        //elog(INFO, "SPI l_suppkey -- %s", value1);
-        //elog(INFO, "SPI l_returnflag_int -- %s", value2);
-        //elog(INFO, "SPI quantity -- %s", value3);
-        int l_suppkey = atoi(value1);
+        
+        //int l_suppkey = atoi(value1);
         //int l_returnflag_int = atoi(value2);
-        double l_tax = strtod(value2, NULL); 
+        //double l_tax = strtod(value2, NULL); 
         int quantity = atoi(value3);
 
-        Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
-        elog(INFO, "l_tax_datum is %f",numericValue3);
+        //Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
+        //elog(INFO, "l_tax_datum is %f",numericValue3);
 
         //int l_suppkey = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 1, NULL));
         //int l_returnflag_int = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 2, NULL));
@@ -273,7 +307,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI l_returnflag_int -- %d", l_returnflag_int);
         //elog(INFO, "SPI quantity -- %d", quantity);
       
-        int groupIndex = findOrCreateGroup(&groupsContext, l_suppkey, l_tax);
+        int groupIndex = findOrCreateGroup(&groupsContext, value1, value2);
         if (groupIndex != -1) { 
             addQuantityToGroup(&groupsContext.groups[groupIndex], quantity);
         }
@@ -297,8 +331,10 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         Datum values[4];
         bool nulls[4] = {false, false, false, false};
 
-        values[0] = Int32GetDatum(group->l_suppkey);
-        values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
+        //values[0] = Int32GetDatum(group->l_suppkey);
+        //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
+        values[0] = Int32GetDatum(atoi(group->l_suppkey));
+        values[1] = DirectFunctionCall3(numeric_in, CStringGetDatum(group->l_tax), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
         values[2] = Float4GetDatum(avg_l_quantity);
         values[3] = Float4GetDatum(stddev);
         //values[0] = group->l_suppkey;
