@@ -59,7 +59,7 @@
 #include "miscadmin.h"
 #include "access/printtup.h"
 //#include "/home/oracle/datasets/postgres11ps/postgres-pbds/contrib/intarray/_int.h"
-#define MAX_QUANTITIES 5 
+#define MAX_QUANTITIES 10 
 #define MAX_GROUPS 90000
 
 PG_MODULE_MAGIC;
@@ -146,7 +146,7 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
 
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
-    int sampleSize = 250;
+    int sampleSize = 500;
     float4 sum = 0;
     int i;
     for (i = 0; i < sampleSize; ++i) {
@@ -305,7 +305,8 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "l_returnflag_int is %d",values[1]);
         //elog(INFO, "avg_l_quantity is %f",avg_l_quantity);
         
-        
+        Datum l_tax_datum = DirectFunctionCall1(text_to_numeric, CStringGetTextDatum(SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, "0.00")));
+        elog(INFO, "l_tax_datum is %f",l_tax_datum);
 
         tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
