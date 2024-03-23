@@ -66,7 +66,7 @@ PG_MODULE_MAGIC;
 
 typedef struct {
     int l_suppkey;
-    int l_returnflag_int;
+    int l_tax;
     float4 quantities[MAX_QUANTITIES];
     int count;
 } MyGroup;
@@ -78,7 +78,7 @@ typedef struct {
 
 // Utility function declarations
 static void prepTuplestoreResult(FunctionCallInfo fcinfo);
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int);
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_tax);
 static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 
@@ -106,11 +106,11 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
     rsinfo->setDesc = NULL;
 }
 
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_returnflag_int) {
+static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_tax) {
     static int last_l_suppkey = -1; 
-    static int last_l_returnflag_int = -1; 
+    static int last_l_tax = -1; 
     static int last_groupIndex = -1; 
-    if (l_suppkey == last_l_suppkey && l_returnflag_int == last_l_returnflag_int) {
+    if (l_suppkey == last_l_suppkey && l_tax == last_l_tax) {
         return last_groupIndex;
     }
 
@@ -123,12 +123,12 @@ static int findOrCreateGroup(GroupsContext *context, int l_suppkey, int l_return
   
     int newIndex = context->numGroups;
     context->groups[context->numGroups].l_suppkey = l_suppkey;
-    context->groups[context->numGroups].l_returnflag_int = l_returnflag_int;
+    context->groups[context->numGroups].l_tax = l_tax;
     context->groups[context->numGroups].count = 0;
 
 
     last_l_suppkey = l_suppkey;
-    last_l_returnflag_int = l_returnflag_int;
+    last_l_tax = l_tax;
     last_groupIndex = newIndex;
 
     context->numGroups++; 
@@ -146,7 +146,7 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
 
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
-    int sampleSize = 1000;
+    int sampleSize = 250;
     float4 sum = 0;
     int i;
     for (i = 0; i < sampleSize; ++i) {
@@ -222,7 +222,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     // Prepare for tuplestore use
     tupdesc = CreateTemplateTupleDesc(4, false);
     TupleDescInitEntry(tupdesc, (AttrNumber) 1, "l_suppkey", INT4OID, -1, 0);
-    TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_returnflag_int", INT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_tax", NUMERICOID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", INT4OID, -1, 0);
@@ -247,7 +247,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI current id is -- %d", i);
 
         int attnum1 = SPI_fnumber(SPI_tuptable->tupdesc, "l_suppkey");
-        int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_returnflag_int");
+        int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_tax");
         int attnum3 = SPI_fnumber(SPI_tuptable->tupdesc, "l_quantity");
         char* value1 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum1);
         char* value2 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum2);
@@ -259,7 +259,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI l_returnflag_int -- %s", value2);
         //elog(INFO, "SPI quantity -- %s", value3);
         int l_suppkey = atoi(value1);
-        int l_returnflag_int = atoi(value2);
+        int l_tax = atoi(value2);
         int quantity = atoi(value3);
 
         //int l_suppkey = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 1, NULL));
@@ -269,7 +269,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI l_returnflag_int -- %d", l_returnflag_int);
         //elog(INFO, "SPI quantity -- %d", quantity);
       
-        int groupIndex = findOrCreateGroup(&groupsContext, l_suppkey, l_returnflag_int);
+        int groupIndex = findOrCreateGroup(&groupsContext, l_suppkey, l_tax);
         if (groupIndex != -1) { 
             addQuantityToGroup(&groupsContext.groups[groupIndex], quantity);
         }
@@ -294,7 +294,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         bool nulls[4] = {false, false, false, false};
 
         values[0] = Int32GetDatum(group->l_suppkey);
-        values[1] = Int32GetDatum(group->l_returnflag_int);
+        values[1] = DirectFunctionCall1(numeric_float8, PointerGetDatum(group->l_tax));
         values[2] = Float4GetDatum(avg_l_quantity);
         values[3] = Float4GetDatum(stddev);
         //values[0] = group->l_suppkey;
