@@ -263,7 +263,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         double l_tax = strtod(value2, NULL); 
         int quantity = atoi(value3);
 
-        Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1))
+        Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
         elog(INFO, "l_tax_datum is %f",numericValue3);
 
         //int l_suppkey = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 1, NULL));
