@@ -263,6 +263,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         double l_tax = strtod(value2, NULL); 
         int quantity = atoi(value3);
 
+        Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1))
+        elog(INFO, "l_tax_datum is %f",numericValue3);
+
         //int l_suppkey = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 1, NULL));
         //int l_returnflag_int = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 2, NULL));
         //int quantity = DatumGetInt32(SPI_getbinval(tuple, tupdesc, 3, NULL));
@@ -305,8 +308,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         //elog(INFO, "l_returnflag_int is %d",values[1]);
         //elog(INFO, "avg_l_quantity is %f",avg_l_quantity);
         
-        Datum l_tax_datum = DirectFunctionCall1(text_to_numeric, CStringGetTextDatum(SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, "0.00")));
-        elog(INFO, "l_tax_datum is %f",l_tax_datum);
+        
 
         tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
