@@ -367,7 +367,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     char* groupby = text_to_cstring(PG_GETARG_TEXT_PP(3));
 
 
-
+    elog(INFO, "SPI sampleSize -- %s", sampleSize);
     per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
     oldcontext = MemoryContextSwitchTo(per_query_ctx);
     tupstore = tuplestore_begin_heap(true, false, work_mem);
