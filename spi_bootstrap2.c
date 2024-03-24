@@ -530,12 +530,12 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
         //elog(INFO, "group l_suppkey is %d", group->l_suppkey);
         //elog(INFO, "group l_returnflag_int is %d", group->l_returnflag_int); 
     }
-    //elog(INFO, "Finish adding");
+    elog(INFO, "Finish adding");
     // Process each group: calculate random sample average and store results
     srand(time(NULL)); // Initialize random seed
     int j;
     for (j = 0; j < groupsContext.numGroups; j++) {
-        //elog(INFO, "SPI j is -- %d", j);
+        elog(INFO, "SPI j is -- %d", j);
         
         MyGroup *group = &groupsContext.groups[j];
         
