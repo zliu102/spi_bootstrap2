@@ -200,9 +200,9 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     return sqrt(variance); 
 }
 
-PG_FUNCTION_INFO_V1(spi_bootstrap_array);
+PG_FUNCTION_INFO_V1(spi_bootstrap_array_all);
 
-Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
+Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
     int ret;
     int i;
     Tuplestorestate *tupstore;
@@ -273,7 +273,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     for (i = 0; i < SPI_processed; i++) {
         //HeapTuple tuple = SPI_tuptable->vals[i];
         //TupleDesc tupdesc = SPI_tuptable->tupdesc;
-        elog(INFO, "SPI current id is -- %d", i);
+        //elog(INFO, "SPI current id is -- %d", i);
 
         int attnum1 = SPI_fnumber(SPI_tuptable->tupdesc, "l_suppkey");
         int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_tax");
