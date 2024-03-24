@@ -20,12 +20,13 @@ AS 'MODULE_PATHNAME','spi_bootstrap_array'
 LANGUAGE C STRICT;*/
 
 CREATE FUNCTION spi_bootstrap_array_all(sampleSize text, tablename text, otherAttribue text,groupby text) 
-RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, avg_l_partkey float4, avg_l_orderkey float4, avg_l_extendedprice float4) 
+RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, avg_l_partkey float4) 
 AS 'MODULE_PATHNAME','spi_bootstrap_array_all' 
 LANGUAGE C STRICT;
 
 
 /*
+, avg_l_orderkey float4, avg_l_extendedprice float4
 , avg_l_orderkey float4, std_l_orderkey float4, avg_l_extendedprice float4, std_l_extendedprice float4,avg_l_linenumber float4, std_l_linenumber float4, avg_l_discount float4, std_l_discount float4
 
 CREATE FUNCTION res_tras_crimes2_c(Datum, int64)
