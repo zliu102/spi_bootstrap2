@@ -76,7 +76,7 @@ typedef struct {
     char* l_tax; 
     float4 quantities[MAX_QUANTITIES];
     float4 partkeys[MAX_QUANTITIES];
-    //float4 orderkeys[MAX_QUANTITIES];
+    float4 orderkeys[MAX_QUANTITIES];
     //float4 extendedprices[MAX_QUANTITIES];
     //float4 discounts[MAX_QUANTITIES];
     //float4 linenumbers[MAX_QUANTITIES];
@@ -93,7 +93,7 @@ static void prepTuplestoreResult(FunctionCallInfo fcinfo);
 //static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
 static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax);
 //static void addQuantityToGroup(MyGroup *group, float4 quantity);
-static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey);
+static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 static float4 calculateStandardDeviation(float4 *quantities, int count, float4 mean);
 
@@ -163,14 +163,14 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
 }*/
 
 
-static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey) {
+static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey, float4 orderkey) {
     if (group->count >= MAX_QUANTITIES) {
         ereport(ERROR, (errmsg("error")));
         return;
     }
     group->quantities[group->count] = quantity;
     group->partkeys[group->count] = partkey;
-    //group->orderkeys[group->count] = orderkey;
+    group->orderkeys[group->count] = orderkey;
     //group->extendedprices[group->count] = extendedprice;
     //group->discounts[group->count] = discount;
     //group->linenumbers[group->count] = linenumber;
@@ -238,15 +238,15 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
     }
 
     // Prepare for tuplestore use
-    tupdesc = CreateTemplateTupleDesc(6, false);
+    tupdesc = CreateTemplateTupleDesc(8, false);
     TupleDescInitEntry(tupdesc, (AttrNumber) 1, "l_suppkey", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_tax", NUMERICOID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 5, "avg_l_partkey", FLOAT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 6, "std_l_partkey", FLOAT4OID, -1, 0);
-    //TupleDescInitEntry(tupdesc, (AttrNumber) 7, "avg_l_orderkey", FLOAT4OID, -1, 0);
-    //TupleDescInitEntry(tupdesc, (AttrNumber) 8, "std_l_orderkey", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 7, "avg_l_orderkey", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 8, "std_l_orderkey", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 9, "avg_l_extendedprice", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 10, "std_l_extendedprice", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 11, "avg_l_discount", FLOAT4OID, -1, 0);
@@ -279,7 +279,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_tax");
         int attnum3 = SPI_fnumber(SPI_tuptable->tupdesc, "l_quantity");
         int attnum4 = SPI_fnumber(SPI_tuptable->tupdesc, "l_partkey");
-        //int attnum5 = SPI_fnumber(SPI_tuptable->tupdesc, "l_orderkey");
+        int attnum5 = SPI_fnumber(SPI_tuptable->tupdesc, "l_orderkey");
         //int attnum6 = SPI_fnumber(SPI_tuptable->tupdesc, "l_extendedprice");
         //int attnum7 = SPI_fnumber(SPI_tuptable->tupdesc, "l_discount");
         //int attnum8 = SPI_fnumber(SPI_tuptable->tupdesc, "l_linenumber");
@@ -288,7 +288,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         char* value2 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum2);
         char* value3 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum3);
         char* value4 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum4);
-        //char* value5 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum5);
+        char* value5 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum5);
         //char* value6 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum6);
         //char* value7 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum7);
         //char* value8 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum8);
@@ -299,7 +299,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //double l_tax = strtod(value2, NULL); 
         int quantity = atoi(value3);
         int partkey = atoi(value4);
-        //int orderkey = atoi(value5);
+        int orderkey = atoi(value5);
         //int extendedprice = atoi(value6);
         //double discount = strtod(value7, NULL);
         //int linenumber = atoi(value8);
@@ -317,7 +317,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
       
         int groupIndex = findOrCreateGroup(&groupsContext, value1, value2);
         if (groupIndex != -1) { 
-            addAttributeToGroup(&groupsContext.groups[groupIndex],quantity,partkey);
+            addAttributeToGroup(&groupsContext.groups[groupIndex],quantity,partkey,orderkey);
         }
 
 
@@ -337,8 +337,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         float4 stddev_l_quantity = calculateStandardDeviation(group->quantities, group->count, avg_l_quantity);
         float4 avg_l_partkey = calculateRandomSampleAverage(group->partkeys, group->count);
         float4 stddev_l_partkey = calculateStandardDeviation(group->partkeys, group->count, avg_l_partkey);
-        //float4 avg_l_orderkey = calculateRandomSampleAverage(group->orderkeys, group->count);
-        //float4 stddev_l_orderkey = calculateStandardDeviation(group->orderkeys, group->count, avg_l_orderkey);
+        float4 avg_l_orderkey = calculateRandomSampleAverage(group->orderkeys, group->count);
+        float4 stddev_l_orderkey = calculateStandardDeviation(group->orderkeys, group->count, avg_l_orderkey);
         //float4 avg_l_extendedprice = calculateRandomSampleAverage(group->extendedprices, group->count);
         //float4 stddev_l_extendedprice = calculateStandardDeviation(group->extendedprices, group->count, avg_l_extendedprice);
         //float4 avg_l_discount = calculateRandomSampleAverage(group->discounts, group->count);
@@ -347,8 +347,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //float4 stddev_l_linenumber = calculateStandardDeviation(group->linenumbers, group->count, avg_l_linenumber);
         
 
-        Datum values[6];
-        bool nulls[6] = {false, false, false, false, false, false};
+        Datum values[8];
+        bool nulls[8] = {false, false, false, false, false, false, false, false};
 
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
@@ -358,8 +358,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         values[3] = Float4GetDatum(stddev_l_quantity);
         values[4] = Float4GetDatum(avg_l_partkey);
         values[5] = Float4GetDatum(stddev_l_partkey);
-        //values[6] = Float4GetDatum(avg_l_orderkey);
-        //values[7] = Float4GetDatum(stddev_l_orderkey);
+        values[6] = Float4GetDatum(avg_l_orderkey);
+        values[7] = Float4GetDatum(stddev_l_orderkey);
         //values[8] = Float4GetDatum(avg_l_extendedprice);
         //values[9] = Float4GetDatum(stddev_l_extendedprice);
         //values[10] = Float4GetDatum(avg_l_discount);

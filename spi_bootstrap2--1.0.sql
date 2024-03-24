@@ -20,7 +20,7 @@ AS 'MODULE_PATHNAME','spi_bootstrap_array'
 LANGUAGE C STRICT;*/
 
 CREATE FUNCTION spi_bootstrap_array_all(sampleSize text, tablename text, otherAttribue text,groupby text) 
-RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, std_l_quantity float4, avg_l_partkey float4, std_l_partkey float4) 
+RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, std_l_quantity float4, avg_l_partkey float4, std_l_partkey float4, avg_l_orderkey float4, std_l_orderkey float4) 
 AS 'MODULE_PATHNAME','spi_bootstrap_array_all' 
 LANGUAGE C STRICT;
 
