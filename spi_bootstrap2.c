@@ -63,14 +63,14 @@
 #define MAX_GROUPS 90000
 
 PG_MODULE_MAGIC;
-
+/*
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
     float4 quantities[MAX_QUANTITIES];
     int count;
-} MyGroup;
-/*
+} MyGroup;*/
+
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
@@ -82,7 +82,7 @@ typedef struct {
     float4 discounts[MAX_QUANTITIES];
     int count;
 } MyGroup;
-*/
+
 typedef struct {
     MyGroup groups[MAX_GROUPS];
     int numGroups;
@@ -119,35 +119,7 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
     rsinfo->setResult = NULL;
     rsinfo->setDesc = NULL;
 }
-/*
-static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax) {
-    static int last_l_suppkey = -1; 
-    static double last_l_tax = -1.0; 
-    static int last_groupIndex = -1; 
-    if (l_suppkey == last_l_suppkey && l_tax == last_l_tax) {
-        return last_groupIndex;
-    }
 
-
-    if (context->numGroups >= MAX_GROUPS) {
-        ereport(ERROR, (errmsg("error")));
-        return -1; 
-    }
-
-  
-    int newIndex = context->numGroups;
-    context->groups[context->numGroups].l_suppkey = l_suppkey;
-    context->groups[context->numGroups].l_tax = l_tax;
-    context->groups[context->numGroups].count = 0;
-
-
-    last_l_suppkey = l_suppkey;
-    last_l_tax = l_tax;
-    last_groupIndex = newIndex;
-
-    context->numGroups++; 
-    return newIndex;
-}*/
 
 static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax) {
     static char* last_l_suppkey = NULL; 
@@ -189,7 +161,7 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
     group->quantities[group->count++] = quantity;
 }
 
-/*
+
 static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey,float4 extendedprice,float4 linenumber,float4 discount) {
     if (group->count >= MAX_QUANTITIES) {
         ereport(ERROR, (errmsg("error")));
@@ -202,7 +174,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,f
     group->linenumbers[group->count] = linenumber;
     group->discounts[group->count] = discount;
     group->count = group->count+1;
-}*/
+}
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
     int sampleSize = 500;
@@ -226,7 +198,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     return sqrt(variance); 
 }
 
-
+/*
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
 Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
@@ -369,9 +341,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}
+}*/
 
-/*
+
 PG_FUNCTION_INFO_V1(spi_bootstrap_array_allattribute);
 
 Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
@@ -534,13 +506,6 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
         values[11] = Float4GetDatum(stddev_l_linenumber);
         values[12] = Float4GetDatum(avg_l_discount);
         values[13] = Float4GetDatum(stddev_l_discount);
-        //values[0] = group->l_suppkey;
-        //values[1] = group->l_returnflag_int;
-        //values[2] = avg_quantity;
-        //elog(INFO, "l_suppkey is %d",values[0]);
-        //elog(INFO, "l_returnflag_int is %d",values[1]);
-        //elog(INFO, "avg_l_quantity is %f",avg_l_quantity);
-        
         
 
         tuplestore_putvalues(tupstore, tupdesc, values, nulls);
@@ -557,7 +522,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}*/
+}
 // Definitions of utility functions...
 
 
