@@ -345,9 +345,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
 }*/
 
 
-PG_FUNCTION_INFO_V1(spi_bootstrap_arrayall);
+PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
-Datum spi_bootstrap_arrayall(PG_FUNCTION_ARGS) {
+Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     int ret;
     int i;
     Tuplestorestate *tupstore;
