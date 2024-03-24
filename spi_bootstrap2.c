@@ -232,7 +232,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     return sqrt(variance); 
 }
 
-
+/*
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
 Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
@@ -255,20 +255,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     char* otherAttribue = text_to_cstring(PG_GETARG_TEXT_PP(2));
     char* groupby = text_to_cstring(PG_GETARG_TEXT_PP(3));
     //prepTuplestoreResult(fcinfo);
-    /*
-    
 
-    per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
-    oldcontext = MemoryContextSwitchTo(CurrentMemoryContext);
-    //oldcontext = MemoryContextSwitchTo(rsinfo->econtext->ecxt_per_query_memory);
-
-    tupstore = tuplestore_begin_heap(true, false, work_mem);
-    rsinfo->returnMode = SFRM_Materialize;
-    rsinfo->setResult = tupstore;
-    rsinfo->setDesc = tupdesc;
-
-    MemoryContextSwitchTo(oldcontext);
-*/
 
 
     per_query_ctx = rsinfo->econtext->ecxt_per_query_memory;
@@ -377,26 +364,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     }
     
 
-    /*
-    Datum values[3]; 
-    bool nulls[3];
-    //bool nulls[3] = {false, false, false}; 
-    nulls[0] = false;
-    nulls[1] = false;
-    nulls[2] = false;
-        
-    values[0] = Int32GetDatum(1); 
-    values[1] = Int32GetDatum(2); 
-    //values[2] = Int32GetDatum(3);
-    values[2] = Float4GetDatum(3.14); 
-    elog(INFO, "here");
-    elog(INFO, "l_suppkey is %d",values[0]);
-    elog(INFO, "l_returnflag_int is %d",values[1]);
-    elog(INFO, "avg_l_quantity is %f",3.14);
-    tuplestore_putvalues(tupstore, tupdesc, values, nulls);
-    //HeapTuple tuple = heap_form_tuple(tupdesc, values, nulls);
-    //tuplestore_puttuple(tupstore, tuple);
-    */
+
     tuplestore_donestoring(tupstore);
     // Cleanup
 
@@ -407,7 +375,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}
+}*/
 
 
 PG_FUNCTION_INFO_V1(spi_bootstrap_array_allattribute);
