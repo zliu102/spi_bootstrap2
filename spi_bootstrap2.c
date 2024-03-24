@@ -385,12 +385,12 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     values[3] = Float4GetDatum(1.0);
     values[4] = Float4GetDatum(1.0);
     values[5] = Float4GetDatum(1.0);
-    */
+    
         
         
 
     tuplestore_putvalues(tupstore, tupdesc, values, nulls);
-    
+    */
     tuplestore_donestoring(tupstore);
     // Cleanup
 
