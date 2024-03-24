@@ -189,6 +189,7 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
     group->quantities[group->count++] = quantity;
 }
 
+/*
 static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey,float4 extendedprice,float4 linenumber,float4 discount) {
     if (group->count >= MAX_QUANTITIES) {
         ereport(ERROR, (errmsg("error")));
@@ -201,7 +202,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,f
     group->linenumbers[group->count] = linenumber;
     group->discounts[group->count] = discount;
     group->count = group->count+1;
-}
+}*/
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
     int sampleSize = 500;
