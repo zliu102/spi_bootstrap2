@@ -94,8 +94,8 @@ static void prepTuplestoreResult(FunctionCallInfo fcinfo);
 static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax);
 //static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey);
-//static float4 calculateRandomSampleAverage(float4 *quantities, int count);
-//static float4 calculateStandardDeviation(float4 *quantities, int count, float4 mean);
+static float4 calculateRandomSampleAverage(float4 *quantities, int count);
+static float4 calculateStandardDeviation(float4 *quantities, int count, float4 mean);
 
 
 static void
@@ -177,7 +177,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey) 
     //group->count = group->count+1;
 }
 
-/*
+
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
     int sampleSize = 500;
     float4 sum = 0;
@@ -198,7 +198,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     }
     float4 variance = sum_diff_sq / count;
     return sqrt(variance); 
-}*/
+}
 
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
@@ -329,26 +329,26 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     srand(time(NULL)); // Initialize random seed
     int j;
     for (j = 0; j < groupsContext.numGroups; j++) {
-        elog(INFO, "SPI j is -- %d", j);
-        /*
+        //elog(INFO, "SPI j is -- %d", j);
+        
         MyGroup *group = &groupsContext.groups[j];
         
         float4 avg_l_quantity = calculateRandomSampleAverage(group->quantities, group->count);
         float4 stddev_l_quantity = calculateStandardDeviation(group->quantities, group->count, avg_l_quantity);
         float4 avg_l_partkey = calculateRandomSampleAverage(group->partkeys, group->count);
         float4 stddev_l_partkey = calculateStandardDeviation(group->partkeys, group->count, avg_l_partkey);
-        float4 avg_l_orderkey = calculateRandomSampleAverage(group->orderkeys, group->count);
-        float4 stddev_l_orderkey = calculateStandardDeviation(group->orderkeys, group->count, avg_l_orderkey);
-        float4 avg_l_extendedprice = calculateRandomSampleAverage(group->extendedprices, group->count);
-        float4 stddev_l_extendedprice = calculateStandardDeviation(group->extendedprices, group->count, avg_l_extendedprice);
-        float4 avg_l_discount = calculateRandomSampleAverage(group->discounts, group->count);
-        float4 stddev_l_discount = calculateStandardDeviation(group->discounts, group->count, avg_l_discount);
-        float4 avg_l_linenumber = calculateRandomSampleAverage(group->linenumbers, group->count);
-        float4 stddev_l_linenumber = calculateStandardDeviation(group->linenumbers, group->count, avg_l_linenumber);
+        //float4 avg_l_orderkey = calculateRandomSampleAverage(group->orderkeys, group->count);
+        //float4 stddev_l_orderkey = calculateStandardDeviation(group->orderkeys, group->count, avg_l_orderkey);
+        //float4 avg_l_extendedprice = calculateRandomSampleAverage(group->extendedprices, group->count);
+        //float4 stddev_l_extendedprice = calculateStandardDeviation(group->extendedprices, group->count, avg_l_extendedprice);
+        //float4 avg_l_discount = calculateRandomSampleAverage(group->discounts, group->count);
+        //float4 stddev_l_discount = calculateStandardDeviation(group->discounts, group->count, avg_l_discount);
+        //float4 avg_l_linenumber = calculateRandomSampleAverage(group->linenumbers, group->count);
+        //float4 stddev_l_linenumber = calculateStandardDeviation(group->linenumbers, group->count, avg_l_linenumber);
         
 
-        Datum values[14];
-        bool nulls[14] = {false, false, false, false, false, false, false, false,false, false, false, false,false, false};
+        Datum values[6];
+        bool nulls[14] = {false, false, false, false, false, false};
 
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
@@ -358,22 +358,22 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
         values[3] = Float4GetDatum(stddev_l_quantity);
         values[4] = Float4GetDatum(avg_l_partkey);
         values[5] = Float4GetDatum(stddev_l_partkey);
-        values[6] = Float4GetDatum(avg_l_orderkey);
-        values[7] = Float4GetDatum(stddev_l_orderkey);
-        values[8] = Float4GetDatum(avg_l_extendedprice);
-        values[9] = Float4GetDatum(stddev_l_extendedprice);
-        values[10] = Float4GetDatum(avg_l_discount);
-        values[11] = Float4GetDatum(stddev_l_discount);
-        values[12] = Float4GetDatum(avg_l_linenumber);
-        values[13] = Float4GetDatum(stddev_l_linenumber);
+        //values[6] = Float4GetDatum(avg_l_orderkey);
+        //values[7] = Float4GetDatum(stddev_l_orderkey);
+        //values[8] = Float4GetDatum(avg_l_extendedprice);
+        //values[9] = Float4GetDatum(stddev_l_extendedprice);
+        //values[10] = Float4GetDatum(avg_l_discount);
+        //values[11] = Float4GetDatum(stddev_l_discount);
+        //values[12] = Float4GetDatum(avg_l_linenumber);
+        //values[13] = Float4GetDatum(stddev_l_linenumber);
         
         
 
-        tuplestore_putvalues(tupstore, tupdesc, values, nulls);*/
+        tuplestore_putvalues(tupstore, tupdesc, values, nulls);
         
     }
 
-
+/*
     Datum values[6];
     bool nulls[6] = {false, false, false, false, false, false};
 
@@ -385,7 +385,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     values[3] = Float4GetDatum(1.0);
     values[4] = Float4GetDatum(1.0);
     values[5] = Float4GetDatum(1.0);
-    
+    */
         
         
 
