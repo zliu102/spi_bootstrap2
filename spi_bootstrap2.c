@@ -440,7 +440,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     MemoryContextSwitchTo(oldcontext); //test
 
     snprintf(sql, sizeof(sql), "select * from reservoir_sampler_tpch(%s,'%s','%s','%s');",sampleSize,tablename,otherAttribue,groupby);
-    //elog(INFO, "SPI query -- %s", sql);
+    elog(INFO, "SPI query -- %s", sql);
     ret = SPI_execute(sql, true, 0);
     if (ret != SPI_OK_SELECT) {
         SPI_finish();
@@ -482,7 +482,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     for (i = 0; i < SPI_processed; i++) {
         //HeapTuple tuple = SPI_tuptable->vals[i];
         //TupleDesc tupdesc = SPI_tuptable->tupdesc;
-        //elog(INFO, "SPI current id is -- %d", i);
+        elog(INFO, "SPI current id is -- %d", i);
 
         int attnum1 = SPI_fnumber(SPI_tuptable->tupdesc, "l_suppkey");
         int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_tax");
