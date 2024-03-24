@@ -63,14 +63,14 @@
 #define MAX_GROUPS 90000
 
 PG_MODULE_MAGIC;
-/*
+
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
     float4 quantities[MAX_QUANTITIES];
     int count;
-} MyGroup;*/
-
+} MyGroup;
+/*
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
@@ -82,7 +82,7 @@ typedef struct {
     float4 discounts[MAX_QUANTITIES];
     int count;
 } MyGroup;
-
+*/
 typedef struct {
     MyGroup groups[MAX_GROUPS];
     int numGroups;
@@ -93,7 +93,7 @@ static void prepTuplestoreResult(FunctionCallInfo fcinfo);
 //static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
 static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_tax);
 static void addQuantityToGroup(MyGroup *group, float4 quantity);
-static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey,float4 extendedprice,float4 linenumber,float4 discount);
+//static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey,float4 extendedprice,float4 linenumber,float4 discount);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
 
 
@@ -161,7 +161,7 @@ static void addQuantityToGroup(MyGroup *group, float4 quantity) {
     group->quantities[group->count++] = quantity;
 }
 
-
+/*
 static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,float4 orderkey,float4 extendedprice,float4 linenumber,float4 discount) {
     if (group->count >= MAX_QUANTITIES) {
         ereport(ERROR, (errmsg("error")));
@@ -174,7 +174,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,f
     group->linenumbers[group->count] = linenumber;
     group->discounts[group->count] = discount;
     group->count = group->count+1;
-}
+}*/
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
     int sampleSize = 500;
@@ -198,7 +198,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     return sqrt(variance); 
 }
 
-/*
+
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
 Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
@@ -230,7 +230,7 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     MemoryContextSwitchTo(oldcontext); //test
 
     snprintf(sql, sizeof(sql), "select * from reservoir_sampler_tpch(%s,'%s','%s','%s');",sampleSize,tablename,otherAttribue,groupby);
-    //elog(INFO, "SPI query -- %s", sql);
+    elog(INFO, "SPI query -- %s", sql);
     ret = SPI_execute(sql, true, 0);
     if (ret != SPI_OK_SELECT) {
         SPI_finish();
@@ -341,9 +341,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}*/
+}
 
-
+/*
 PG_FUNCTION_INFO_V1(spi_bootstrap_array_allattribute);
 
 Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
@@ -524,7 +524,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     PG_RETURN_NULL();
 }
 // Definitions of utility functions...
-
+*/
 
 
 /*

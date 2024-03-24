@@ -1,32 +1,3 @@
-/* 
-CREATE FUNCTION res_trans_crimes_spi(bigint, bigint, bigint)
-        RETURNS bigint
-        AS 'MODULE_PATHNAME', 'res_trans_crimes_spi'
-        LANGUAGE C
-        IMMUTABLE 
-        PARALLEL SAFE;
-
-CREATE FUNCTION finalize_trans_crimes_spi(bigint)
-        RETURNS bigint[]
-        AS 'MODULE_PATHNAME','finalize_trans_crimes_spi'
-        LANGUAGE C
-        IMMUTABLE 
-        PARALLEL SAFE;
-
-CREATE AGGREGATE reservoir_sampling_spi(bigint,bigint)
-(
-        sfunc = res_trans_crimes_spi,
-        stype = bigint,
-        FINALFUNC = finalize_trans_crimes_spi,
-        INITCOND=-1
-);
-
-CREATE FUNCTION spi_test2() 
-RETURNS TABLE (beat bigint, ward bigint,zip_codes bigint[]) 
-AS 'MODULE_PATHNAME','spi_test2' 
-LANGUAGE C STRICT;
-*/
-
 
 
 /*
@@ -42,16 +13,16 @@ AS 'MODULE_PATHNAME','spi_bootstrap'
 LANGUAGE C STRICT;
 */
 
-/*
+
 CREATE FUNCTION spi_bootstrap_array(sampleSize text, tablename text, otherAttribue text,groupby text) 
 RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, std_l_quantity float4) 
 AS 'MODULE_PATHNAME','spi_bootstrap_array' 
 LANGUAGE C STRICT;
-*/
+/*
 CREATE FUNCTION spi_bootstrap_array_allattribute(sampleSize text, tablename text, otherAttribue text,groupby text) 
 RETURNS TABLE (l_suppkey int, l_tax numeric, avg_l_quantity float4, std_l_quantity float4, avg_l_partkey float4, std_l_partkey float4, avg_l_orderkey float4, std_l_orderkey float4,avg_l_extendedprice float4, std_l_extendedprice float4,avg_l_linenumber float4, std_l_linenumber float4,avg_l_discount float4, std_l_discount float4) 
 AS 'MODULE_PATHNAME','spi_bootstrap_array_allattribute' 
-LANGUAGE C STRICT;
+LANGUAGE C STRICT;*/
 
 /*
 
