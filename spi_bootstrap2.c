@@ -63,21 +63,14 @@
 #define MAX_GROUPS 90000
 
 PG_MODULE_MAGIC;
-/*
-typedef struct {
-    int l_suppkey;
-    double l_tax;
-    float4 quantities[MAX_QUANTITIES];
-    int count;
-} MyGroup;
 
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
     float4 quantities[MAX_QUANTITIES];
     int count;
-} MyGroup;*/
-
+} MyGroup;
+/*
 typedef struct {
     char* l_suppkey; 
     char* l_tax; 
@@ -89,7 +82,7 @@ typedef struct {
     float4 discounts[MAX_QUANTITIES];
     int count;
 } MyGroup;
-
+*/
 typedef struct {
     MyGroup groups[MAX_GROUPS];
     int numGroups;
@@ -232,7 +225,7 @@ static float4 calculateStandardDeviation(float4 *quantities, int count, float4 m
     return sqrt(variance); 
 }
 
-/*
+
 PG_FUNCTION_INFO_V1(spi_bootstrap_array);
 
 Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
@@ -375,9 +368,9 @@ Datum spi_bootstrap_array(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}*/
+}
 
-
+/*
 PG_FUNCTION_INFO_V1(spi_bootstrap_array_allattribute);
 
 Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
@@ -563,7 +556,7 @@ Datum spi_bootstrap_array_allattribute(PG_FUNCTION_ARGS) {
     SPI_finish();
 
     PG_RETURN_NULL();
-}
+}*/
 // Definitions of utility functions...
 
 
