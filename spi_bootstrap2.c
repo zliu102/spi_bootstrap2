@@ -174,7 +174,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey) 
     //group->extendedprices[group->count] = extendedprice;
     //group->discounts[group->count] = discount;
     //group->linenumbers[group->count] = linenumber;
-    //group->count = group->count+1;
+    group->count = group->count+1;
 }
 
 
