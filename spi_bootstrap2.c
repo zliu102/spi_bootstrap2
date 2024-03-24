@@ -201,12 +201,13 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity,float4 partkey,f
         ereport(ERROR, (errmsg("error")));
         return;
     }
-    group->quantities[group->count++] = quantity;
-    group->partkeys[group->count++] = partkey;
-    group->orderkeys[group->count++] = orderkey;
-    group->extendedprices[group->count++] = extendedprice;
-    group->linenumbers[group->count++] = linenumber;
-    group->discounts[group->count++] = discount;
+    group->quantities[group->count] = quantity;
+    group->partkeys[group->count] = partkey;
+    group->orderkeys[group->count] = orderkey;
+    group->extendedprices[group->count] = extendedprice;
+    group->linenumbers[group->count] = linenumber;
+    group->discounts[group->count] = discount;
+    group->count = group->count+1;
 }
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
