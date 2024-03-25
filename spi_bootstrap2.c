@@ -238,17 +238,17 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
     }
 
     // Prepare for tuplestore use
-    tupdesc = CreateTemplateTupleDesc(4, false);
+    tupdesc = CreateTemplateTupleDesc(6, false);
     TupleDescInitEntry(tupdesc, (AttrNumber) 1, "l_suppkey", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_tax", NUMERICOID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
-    //TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 4, "avg_l_partkey", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 6, "std_l_partkey", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 4, "avg_l_orderkey", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 8, "std_l_orderkey", FLOAT4OID, -1, 0);
-    TupleDescInitEntry(tupdesc, (AttrNumber) 4, "avg_l_extendedprice", FLOAT4OID, -1, 0);
-    //TupleDescInitEntry(tupdesc, (AttrNumber) 10, "std_l_extendedprice", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 5, "avg_l_extendedprice", FLOAT4OID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 6, "std_l_extendedprice", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 11, "avg_l_discount", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 12, "std_l_discount", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 5, "avg_l_linenumber", FLOAT4OID, -1, 0);
@@ -334,34 +334,34 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         MyGroup *group = &groupsContext.groups[j];
         
         float4 avg_l_quantity = calculateRandomSampleAverage(group->quantities, group->count);
-        //float4 stddev_l_quantity = calculateStandardDeviation(group->quantities, group->count, avg_l_quantity);
+        float4 stddev_l_quantity = calculateStandardDeviation(group->quantities, group->count, avg_l_quantity);
         //float4 avg_l_partkey = calculateRandomSampleAverage(group->partkeys, group->count);
         //float4 stddev_l_partkey = calculateStandardDeviation(group->partkeys, group->count, avg_l_partkey);
         //float4 avg_l_orderkey = calculateRandomSampleAverage(group->orderkeys, group->count);
         //float4 stddev_l_orderkey = calculateStandardDeviation(group->orderkeys, group->count, avg_l_orderkey);
         float4 avg_l_extendedprice = calculateRandomSampleAverage(group->extendedprices, group->count);
-        //float4 stddev_l_extendedprice = calculateStandardDeviation(group->extendedprices, group->count, avg_l_extendedprice);
+        float4 stddev_l_extendedprice = calculateStandardDeviation(group->extendedprices, group->count, avg_l_extendedprice);
         //float4 avg_l_discount = calculateRandomSampleAverage(group->discounts, group->count);
         //float4 stddev_l_discount = calculateStandardDeviation(group->discounts, group->count, avg_l_discount);
         //float4 avg_l_linenumber = calculateRandomSampleAverage(group->linenumbers, group->count);
         //float4 stddev_l_linenumber = calculateStandardDeviation(group->linenumbers, group->count, avg_l_linenumber);
         
 
-        Datum values[4];
-        bool nulls[4] = {false, false, false, false};
+        Datum values[6];
+        bool nulls[6] = {false, false, false, false, false, false};
 
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
         values[0] = Int32GetDatum(atoi(group->l_suppkey));
         values[1] = DirectFunctionCall3(numeric_in, CStringGetDatum(group->l_tax), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
         values[2] = Float4GetDatum(avg_l_quantity);
-        //values[3] = Float4GetDatum(stddev_l_quantity);
+        values[3] = Float4GetDatum(stddev_l_quantity);
         //values[3] = Float4GetDatum(avg_l_partkey);
         //values[5] = Float4GetDatum(stddev_l_partkey);
         //values[3] = Float4GetDatum(avg_l_orderkey);
         //values[7] = Float4GetDatum(stddev_l_orderkey);
-        values[3] = Float4GetDatum(avg_l_extendedprice);
-        //values[9] = Float4GetDatum(stddev_l_extendedprice);
+        values[4] = Float4GetDatum(avg_l_extendedprice);
+        values[5] = Float4GetDatum(stddev_l_extendedprice);
         //values[10] = Float4GetDatum(avg_l_discount);
         //values[11] = Float4GetDatum(stddev_l_discount);
         //values[4] = Float4GetDatum(avg_l_linenumber);
