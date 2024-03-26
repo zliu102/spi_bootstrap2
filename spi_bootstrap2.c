@@ -293,7 +293,6 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //char* value7 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum7);
         //char* value8 = SPI_getvalue((SPI_tuptable->vals)[i], SPI_tuptable->tupdesc, attnum8);
 
-        
         //int l_suppkey = atoi(value1);
         //int l_returnflag_int = atoi(value2);
         //double l_tax = strtod(value2, NULL); 
@@ -303,6 +302,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         int extendedprice = atoi(value6);
         //double discount = strtod(value7, NULL);
         //int linenumber = atoi(value8);
+        elog(INFO, "l_suppkey is %d",atoi(value1));
+        elog(INFO, "l_linenumber is %d",atoi(value2));
         
 
         //Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
@@ -367,7 +368,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //values[11] = Float4GetDatum(stddev_l_discount);
         //values[4] = Float4GetDatum(avg_l_linenumber);
         //values[13] = Float4GetDatum(stddev_l_linenumber);
-        
+        elog(INFO, "l_suppkey is %d", values[0]);
+        elog(INFO, "l_linenumber is %d", values[1]);
         
 
         tuplestore_putvalues(tupstore, tupdesc, values, nulls);
