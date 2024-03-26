@@ -59,8 +59,8 @@
 #include "miscadmin.h"
 #include "access/printtup.h"
 //#include "/home/oracle/datasets/postgres11ps/postgres-pbds/contrib/intarray/_int.h"
-#define MAX_QUANTITIES 8 
-#define MAX_GROUPS 110000
+#define MAX_QUANTITIES 2 
+#define MAX_GROUPS 799541
 
 PG_MODULE_MAGIC;
 /*
@@ -73,7 +73,7 @@ typedef struct {
 */
 typedef struct {
     char* l_suppkey; 
-    char* l_discount; 
+    char* l_partkey; 
     float4 quantities[MAX_QUANTITIES];
     //float4 partkeys[MAX_QUANTITIES];
     //float4 orderkeys[MAX_QUANTITIES];
@@ -91,7 +91,7 @@ typedef struct {
 // Utility function declarations
 static void prepTuplestoreResult(FunctionCallInfo fcinfo);   
 //static int findOrCreateGroup(GroupsContext *context, int l_suppkey, double l_tax);
-static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_discount);
+static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_partkey);
 //static void addQuantityToGroup(MyGroup *group, float4 quantity);
 static void addAttributeToGroup(MyGroup *group, float4 quantity, float4 extendedprice);
 static float4 calculateRandomSampleAverage(float4 *quantities, int count);
@@ -122,14 +122,14 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
 }
 
 
-static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_discount) {
+static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_partkey) {
     static char* last_l_suppkey = NULL; 
-    static char* last_l_discount = NULL;
+    static char* last_l_partkey = NULL;
     static int last_groupIndex = -1;
     
     // 检查上一个值是否相同（这里使用 strcmp 比较字符串）
     if ((last_l_suppkey != NULL && strcmp(l_suppkey, last_l_suppkey) == 0) &&
-        (last_l_discount != NULL && strcmp(l_discount, last_l_discount) == 0)) {
+        (last_l_partkey != NULL && strcmp(l_partkey, last_l_partkey) == 0)) {
         return last_groupIndex;
     }
 
@@ -141,12 +141,12 @@ static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_di
     int newIndex = context->numGroups;
     // 使用 strdup 或等效方法复制字符串
     context->groups[newIndex].l_suppkey = strdup(l_suppkey);
-    context->groups[newIndex].l_discount = strdup(l_discount);
+    context->groups[newIndex].l_partkey = strdup(l_partkey);
     context->groups[newIndex].count = 0;
 
     // 更新上一个值的指针
     last_l_suppkey = context->groups[newIndex].l_suppkey;
-    last_l_discount = context->groups[newIndex].l_discount;
+    last_l_discount = context->groups[newIndex].l_partkey;
     last_groupIndex = newIndex;
 
     context->numGroups++;
@@ -179,7 +179,7 @@ static void addAttributeToGroup(MyGroup *group, float4 quantity, float4 extended
 
 
 static float4 calculateRandomSampleAverage(float4 *quantities, int count) {
-    int sampleSize = 500;
+    int sampleSize = 100;
     float4 sum = 0;
     int i;
     for (i = 0; i < sampleSize; ++i) {
@@ -240,7 +240,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
     // Prepare for tuplestore use
     tupdesc = CreateTemplateTupleDesc(6, false);
     TupleDescInitEntry(tupdesc, (AttrNumber) 1, "l_suppkey", INT4OID, -1, 0);
-    TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_discount", NUMERICOID, -1, 0);
+    TupleDescInitEntry(tupdesc, (AttrNumber) 2, "l_partkey", INT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 3, "avg_l_quantity", FLOAT4OID, -1, 0);
     TupleDescInitEntry(tupdesc, (AttrNumber) 4, "std_l_quantity", FLOAT4OID, -1, 0);
     //TupleDescInitEntry(tupdesc, (AttrNumber) 4, "avg_l_partkey", FLOAT4OID, -1, 0);
@@ -276,7 +276,7 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //elog(INFO, "SPI current id is -- %d", i);
 
         int attnum1 = SPI_fnumber(SPI_tuptable->tupdesc, "l_suppkey");
-        int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_discount");
+        int attnum2 = SPI_fnumber(SPI_tuptable->tupdesc, "l_partkey");
         int attnum3 = SPI_fnumber(SPI_tuptable->tupdesc, "l_quantity");
         //int attnum4 = SPI_fnumber(SPI_tuptable->tupdesc, "l_partkey");
         //int attnum5 = SPI_fnumber(SPI_tuptable->tupdesc, "l_orderkey");
@@ -355,8 +355,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
         values[0] = Int32GetDatum(atoi(group->l_suppkey));
-        values[1] = DirectFunctionCall3(numeric_in, CStringGetDatum(group->l_discount), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
-        //values[1] = Int32GetDatum(atoi(group->l_discount));
+        //values[1] = DirectFunctionCall3(numeric_in, CStringGetDatum(group->l_discount), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
+        values[1] = Int32GetDatum(atoi(group->l_partkey));
         values[2] = Float4GetDatum(avg_l_quantity);
         values[3] = Float4GetDatum(stddev_l_quantity);
         //values[3] = Float4GetDatum(avg_l_partkey);
