@@ -350,13 +350,13 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
 
         Datum values[6];
         bool nulls[6] = {false, false, false, false, false, false};
-        elog(INFO, "l_suppkey 0 is %s", group->l_suppkey);
-        elog(INFO, "l_linenumber 0 is %s", group->l_linenumber);
+        //elog(INFO, "l_suppkey 0 is %s", group->l_suppkey);
+        //elog(INFO, "l_linenumber 0 is %s", group->l_linenumber);
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
         values[0] = Int32GetDatum(atoi(group->l_suppkey));
         //values[1] = DirectFunctionCall3(numeric_in, CStringGetDatum(group->l_tax), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
-        values[0] = Int32GetDatum(atoi(group->l_linenumber));
+        values[1] = Int32GetDatum(atoi(group->l_linenumber));
         values[2] = Float4GetDatum(avg_l_quantity);
         values[3] = Float4GetDatum(stddev_l_quantity);
         //values[3] = Float4GetDatum(avg_l_partkey);
@@ -369,8 +369,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         //values[11] = Float4GetDatum(stddev_l_discount);
         //values[4] = Float4GetDatum(avg_l_linenumber);
         //values[13] = Float4GetDatum(stddev_l_linenumber);
-        elog(INFO, "l_suppkey is %d", values[0]);
-        elog(INFO, "l_linenumber is %d", values[1]);
+        //elog(INFO, "l_suppkey is %d", values[0]);
+        //elog(INFO, "l_linenumber is %d", values[1]);
         
 
         tuplestore_putvalues(tupstore, tupdesc, values, nulls);
