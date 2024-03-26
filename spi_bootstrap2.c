@@ -146,7 +146,7 @@ static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_pa
 
     // 更新上一个值的指针
     last_l_suppkey = context->groups[newIndex].l_suppkey;
-    last_l_discount = context->groups[newIndex].l_partkey;
+    last_l_partkey = context->groups[newIndex].l_partkey;
     last_groupIndex = newIndex;
 
     context->numGroups++;
