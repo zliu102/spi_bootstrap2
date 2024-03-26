@@ -124,7 +124,7 @@ prepTuplestoreResult(FunctionCallInfo fcinfo)
 
 static int findOrCreateGroup(GroupsContext *context, char* l_suppkey, char* l_linenumber) {
     static char* last_l_suppkey = NULL; 
-    static char* l_linenumber = NULL;
+    static char* last_l_linenumber = NULL;
     static int last_groupIndex = -1;
     
     // 检查上一个值是否相同（这里使用 strcmp 比较字符串）
