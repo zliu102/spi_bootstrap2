@@ -302,8 +302,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
         int extendedprice = atoi(value6);
         //double discount = strtod(value7, NULL);
         //int linenumber = atoi(value8);
-        elog(INFO, "l_suppkey is %d",atoi(value1));
-        elog(INFO, "l_linenumber is %d",atoi(value2));
+        //elog(INFO, "l_suppkey is %d",atoi(value1));
+        //elog(INFO, "l_linenumber is %d",atoi(value2));
         
 
         //Datum numericValue3 = DirectFunctionCall3(numeric_in, CStringGetDatum("0.00"), ObjectIdGetDatum(InvalidOid), Int32GetDatum(-1));
@@ -350,7 +350,8 @@ Datum spi_bootstrap_array_all(PG_FUNCTION_ARGS) {
 
         Datum values[6];
         bool nulls[6] = {false, false, false, false, false, false};
-
+        elog(INFO, "l_suppkey 0 is %s", group->l_suppkey);
+        elog(INFO, "l_linenumber 0 is %s", group->l_linenumber);
         //values[0] = Int32GetDatum(group->l_suppkey);
         //values[1] = DirectFunctionCall1(float8_numeric, Float8GetDatum(group->l_tax));
         values[0] = Int32GetDatum(atoi(group->l_suppkey));
